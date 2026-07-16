@@ -83,12 +83,21 @@ export async function updateExpense(
   id: number,
   data: Partial<ExpenseFormData>,
 ): Promise<Expense> {
+  const expenseData: any = { ...data };
+
+  if (expenseData.category !== undefined) {
+    const categories = await fetchCategories();
+    const category = categories.find((c) => c.name === expenseData.category);
+    expenseData.category_id = category?.id;
+    delete expenseData.category;
+  }
+
   const response = await fetch(`${API_BASE_URL}/expenses/${id}`, {
     method: "PUT",
     headers: {
       "Content-Type": "application/json",
     },
-    body: JSON.stringify({ expense: data }),
+    body: JSON.stringify({ expense: expenseData }),
   });
 
   if (!response.ok) {
