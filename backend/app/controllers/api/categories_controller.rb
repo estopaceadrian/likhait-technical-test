@@ -5,6 +5,12 @@ class Api::CategoriesController < ApplicationController
   end
 
   def create
+    category = Category.find_by(name: category_params[:name])
+    if category
+      render json: { id: category.id, name: category.name }, status: :ok
+      return
+    end
+
     category = Category.new(category_params)
 
     if category.save
