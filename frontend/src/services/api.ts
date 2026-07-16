@@ -2,9 +2,8 @@
  * API service for communicating with the backend
  */
 
+import { API_BASE_URL } from "../constants/config";
 import { Expense, ExpenseFormData } from "../types";
-
-const API_BASE_URL = "http://localhost:3000/api";
 
 /**
  * Fetch all expenses
@@ -43,6 +42,26 @@ export async function fetchCategories(): Promise<
   if (!response.ok) {
     throw new Error("Failed to fetch categories");
   }
+  return response.json();
+}
+
+/**
+ * Create a new category
+ */
+export async function createCategory(name: string): Promise<{ id: number; name: string }> {
+  const response = await fetch(`${API_BASE_URL}/categories`, {
+    method: "POST",
+    headers: {
+      "Content-Type": "application/json",
+    },
+    body: JSON.stringify({ category: { name } }),
+  });
+
+  if (!response.ok) {
+    const error = await response.json().catch(() => ({}));
+    throw new Error(error.errors?.join(", ") || "Failed to create category");
+  }
+
   return response.json();
 }
 
