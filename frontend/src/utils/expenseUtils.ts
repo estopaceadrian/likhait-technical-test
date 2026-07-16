@@ -3,6 +3,7 @@
  */
 
 import { Expense } from "../types";
+import { EXPENSE_VALIDATION_MESSAGES } from "../constants/validationMessages";
 
 /**
  * Calculate total amount from an array of expenses
@@ -49,4 +50,20 @@ export function groupExpensesByDay(expenses: Expense[]) {
   });
 
   return grouped;
+}
+
+/**
+ * Validate expense date: must not be empty and must not be in the future
+ */
+export function validateExpenseDate(date: string): string | undefined {
+  if (!date) {
+    return EXPENSE_VALIDATION_MESSAGES.dateRequired;
+  }
+
+  const today = formatDate(new Date());
+  if (date > today) {
+    return EXPENSE_VALIDATION_MESSAGES.dateFuture;
+  }
+
+  return undefined;
 }

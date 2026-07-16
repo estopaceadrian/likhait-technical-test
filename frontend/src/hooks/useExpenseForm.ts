@@ -4,7 +4,8 @@
 
 import { useState } from "react";
 import { ExpenseFormData } from "../types";
-import { formatDate } from "../utils/expenseUtils";
+import { formatDate, validateExpenseDate } from "../utils/expenseUtils";
+import { EXPENSE_VALIDATION_MESSAGES } from "../constants/validationMessages";
 
 interface UseExpenseFormProps {
   initialData?: Partial<ExpenseFormData>;
@@ -34,19 +35,24 @@ export function useExpenseForm({ initialData, onSubmit }: UseExpenseFormProps) {
     const newErrors: Partial<ExpenseFormData> = {};
 
     if (!formData.amount || Number(formData.amount) <= 0) {
-      newErrors.amount = "Amount must be greater than 0";
+      newErrors.amount = EXPENSE_VALIDATION_MESSAGES.amountPositive;
     }
 
     if (!formData.description.trim()) {
-      newErrors.description = "Description is required";
+      newErrors.description = EXPENSE_VALIDATION_MESSAGES.descriptionRequired;
     }
 
     if (!formData.category) {
-      newErrors.category = "Category is required";
+      newErrors.category = EXPENSE_VALIDATION_MESSAGES.categoryRequired;
     }
 
     if (!formData.date) {
-      newErrors.date = "Date is required";
+      newErrors.date = EXPENSE_VALIDATION_MESSAGES.dateRequired;
+    } else {
+      const dateError = validateExpenseDate(formData.date);
+      if (dateError) {
+        newErrors.date = dateError;
+      }
     }
 
     setErrors(newErrors);

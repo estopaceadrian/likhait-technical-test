@@ -9,6 +9,7 @@ import { TextField, SelectBox, Button, Modal } from "../vibes";
 import { useExpenseForm } from "../hooks/useExpenseForm";
 import { fetchCategories, createCategory } from "../services/api";
 import { CategoryForm } from "./CategoryForm";
+import { formatDate } from "../utils/expenseUtils";
 
 interface ExpenseFormProps {
   initialData?: Partial<ExpenseFormData>;
@@ -161,6 +162,7 @@ export function ExpenseForm({
         error={errors.date}
         fullWidth
         required
+        max={formatDate(new Date())}
       />
 
       <div style={buttonGroupStyle}>
@@ -185,7 +187,11 @@ export function ExpenseForm({
       </div>
 
       <Modal isOpen={isAddCategoryOpen} onClose={closeAddCategory} title="Add Category">
-        <CategoryForm onSubmit={handleCategoryCreated} onCancel={closeAddCategory} />
+        <CategoryForm
+          onSubmit={handleCategoryCreated}
+          onCancel={closeAddCategory}
+          categoryNames={categoryOptions.map((option) => option.value)}
+        />
       </Modal>
     </form>
   );

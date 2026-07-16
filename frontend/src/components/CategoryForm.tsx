@@ -5,13 +5,19 @@
 import { useState } from "react";
 import { TextField, Button } from "../vibes";
 import { createCategory } from "../services/api";
+import { EXPENSE_VALIDATION_MESSAGES } from "../constants/validationMessages";
 
 interface CategoryFormProps {
   onSubmit: (name: string) => void;
   onCancel?: () => void;
+  categoryNames?: string[];
 }
 
-export function CategoryForm({ onSubmit, onCancel }: CategoryFormProps) {
+export function CategoryForm({
+  onSubmit,
+  onCancel,
+  categoryNames = [],
+}: CategoryFormProps) {
   const [name, setName] = useState("");
   const [error, setError] = useState("");
   const [isSubmitting, setIsSubmitting] = useState(false);
@@ -19,7 +25,16 @@ export function CategoryForm({ onSubmit, onCancel }: CategoryFormProps) {
   const handleSave = async () => {
     const trimmed = name.trim();
     if (!trimmed) {
-      setError("Category name is required");
+      setError(EXPENSE_VALIDATION_MESSAGES.categoryCreateRequired);
+      return;
+    }
+
+    if (
+      categoryNames.some(
+        (existing) => existing.toLowerCase() === trimmed.toLowerCase(),
+      )
+    ) {
+      setError(EXPENSE_VALIDATION_MESSAGES.categoryDuplicate);
       return;
     }
 
@@ -28,7 +43,10 @@ export function CategoryForm({ onSubmit, onCancel }: CategoryFormProps) {
       await createCategory(trimmed);
       onSubmit(trimmed);
     } catch (err) {
-      const message = err instanceof Error ? err.message : "Failed to add category";
+      const message =
+        err instanceof Error
+          ? err.message
+          : EXPENSE_VALIDATION_MESSAGES.categoryCreateFailed;
       setError(message);
     } finally {
       setIsSubmitting(false);
